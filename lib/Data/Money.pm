@@ -695,6 +695,8 @@ Currently maintained by Mohammad S Anwar (MANWAR) C<< <mohammad.anwar at yahoo.c
 
 L<https://github.com/manwar/Data-Money>
 
+=head1 LICENSE AND COPYRIGHT
+
 Copyright 2010 Cory Watson
 
 This program is free software; you can redistribute it and/or modify it under the
