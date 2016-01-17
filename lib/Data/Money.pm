@@ -3,6 +3,17 @@ package Data::Money;
 $Data::Money::VERSION   = '0.08';
 $Data::Money::AUTHORITY = 'cpan:GPHAT';
 
+=head1 NAME
+
+Data::Money - Money/currency with formatting and overloading.
+
+=head1 VERSION
+
+Version 0.08
+
+=cut
+
+use 5.006;
 use Moo;
 use namespace::clean;
 
@@ -77,18 +88,122 @@ has code   => (is => 'rw', isa => $CurrencyCode, default => sub { 'USD'        }
 has format => (is => 'rw', isa => $Format,       default => sub { 'FMT_COMMON' });
 has value  => (is => 'rw', isa => $Amount,       default => sub { Math::BigFloat->new(0) }, coerce => $Amount);
 
+=head1 DESCRIPTION
+
+The C<Data::Money> module provides basic currency formatting and  number handling
+via L<Math::BigFloat>:
+
+    my $currency = Data::Money->new(value => 1.23);
+
+Each C<Data::Money> object will stringify to the original  value except in string
+context, where it stringifies to the format specified in C<format>.
+
+=head1 MOTIVATION
+
+Data::Money was created to make it easy to use  different currencies ( leveraging
+existing work in C<Locale::Currency> and L<Moose|Moose>),to allow math operations
+with proper rounding (via L<Math::BigFloat>) and formatting via L<Locale::Currency::Format>.
+
+=head1 SYNOPSIS
+
+    use strict; use warnings;
+    use Data::Money;
+
+    my $price = Data::Money->new(value => 1.2. code => 'USD');
+    print $price;            # $1.20
+    print $price->code;      # USD
+    print $price->format;    # FMT_COMMON
+    print $price->as_string; # $1.20
+
+    # Overloading, returns new instance
+    my $m2 = $price + 1;
+    my $m3 = $price - 1;
+    my $m4 = $price * 1;
+    my $m5 = $price / 1;
+    my $m6 = $price % 1;
+
+    # Objects work too
+    my $m7 = $m2 + $m3;
+    my $m8 = $m2 - $m3;
+    my $m9 = $m2 * $m3;
+    my $m10 = $m2 / $m3;
+
+    # Modifies in place
+    $price += 1;
+    $price -= 1;
+    $price *= 1;
+    $price /= 1;
+
+    # Compares against numbers
+    if($m2 > 2)
+    if($m2 < 3)
+    if($m2 == 2.2)
+
+    # And strings
+    if($m2 gt '$2.00')
+    if($m2 lt '$3.00')
+    if($m2 eq '$2.20')
+
+    # and objects
+    if($m2 > $m3)
+    if($m3 lt $m2)
+
+    print $price->as_string('FMT_SYMBOL'); # $1.20
+
+=cut
+
 sub BUILD {
     my ($self) = @_;
 
     my $exp = 0;
     my $dec = $self->value->copy->bmod(1);
-    my $s = sprintf("Value [%s]", $self->value);
     $exp = $dec->exponent->babs if ($dec);
     my $prec = Math::BigInt->new($self->_decimal_precision);
 
-    Data::Money::Exception->throw(error => 'Excessive precision for this currency type' . "[$exp][$prec][$s]" )
+    Data::Money::Exception->throw(error => 'Excessive precision for this currency type')
         if ($exp > $prec);
 }
+
+=head1 METHODS
+
+=head2 name()
+
+Returns C<Data::Money> object currency name.
+
+=head2 code($currency_code)
+
+Gets/sets the three letter currency code for the current currency object.Defaults
+to USD.
+
+=head2 value()
+
+Returns the amount. Defaults to 0.
+
+=head2 format($string)
+
+Gets/sets the format to be used when C<as_string()> is called. See L<Locale::Currency::Format>
+for the available formatting options.  Defaults to C<FMT_COMMON>.
+
+=cut
+
+sub name {
+    my ($self) = @_;
+
+    my $name = code2currency($self->code);
+    ## Fix for older Locale::Currency w/mispelled Candian
+    $name =~ s/Candian/Canadian/ms;
+
+    return $name;
+}
+
+=head2 clone(%params)
+
+Returns a clone (new instance) of this  C<Data::Money> object. You may optionally
+specify some of the attributes to overwrite.
+
+    $currency->clone({ value => 100 }); # Clones all fields but changes value to 100
+
+=cut
 
 sub clone {
     my ($self, %param) = @_;
@@ -98,12 +213,25 @@ sub clone {
     return Data::Money->new( \%param );
 }
 
+=head2 as_float()
+
+Returns C<Data::Money> object value without any formatting.
+
+=cut
+
 # Liberally jacked from Math::Currency
 sub as_float {
     my ($self) = @_;
 
     return $self->value->copy->bfround(0 - $self->_decimal_precision)->bstr;
 }
+
+=head2 as_int()
+
+Returns the object's value "in pennies" (in the US at least). It strips the value
+of formatting using C<as_float()> and of any decimals.
+
+=cut
 
 # Liberally jacked from Math::Currency
 sub as_int {
@@ -114,11 +242,25 @@ sub as_int {
     return $str eq '' ? '0' : $str;
 }
 
+=head2 absolute()
+
+Returns a new C<Data::Money>  object  with the value set to the absolute value of
+the original.
+
+=cut
+
 sub absolute {
     my ($self) = @_;
 
     return $self->clone(value => abs $self->value);
 }
+
+=head2 negate()
+
+Performs  the  negation operation, returning a new C<Data::Money> object with the
+opposite value (1 to -1, -2 to 2, etc).
+
+=cut
 
 sub negate {
     my ($self) = @_;
@@ -128,6 +270,14 @@ sub negate {
     my $val = 0 - $self->value;
     return $self->clone(value => $val);
 }
+
+=head2 add($num)
+
+Adds the specified amount to this C<Data::Money> object and returns a new C<Data::Money>
+object. You can supply either a number or a C<Data::Money> object. Note that this B<does not>
+modify the existing object.
+
+=cut
 
 sub add {
     my $self = shift;
@@ -143,6 +293,14 @@ sub add {
 
     return $self->clone(value => $self->value->copy->badd($self->clone(value => $num)->value))
 }
+
+=head2 add_in_place($num)
+
+Adds the specified amount to this C<Data::Money> object, modifying its value. You
+can  supply  either  a number  or a C<Data::Money> object. Note that this B<does>
+modify the existing object.
+
+=cut
 
 sub add_in_place {
     my ($self, $num) = @_;
@@ -160,15 +318,12 @@ sub add_in_place {
     return $self;
 }
 
-sub name {
-    my ($self) = @_;
+=head2 as_string()
 
-    my $name = code2currency($self->code);
-    ## Fix for older Locale::Currency w/mispelled Candian
-    $name =~ s/Candian/Canadian/ms;
+Returns C<Data::Money> object as string.There is an alias C<stringify()> as well.
 
-    return $name;
-}
+=cut
+
 
 *as_string = \&stringify;
 
@@ -196,6 +351,14 @@ sub stringify {
     }
 }
 
+=head2 substract($num)
+
+Subtracts  the  specified amount  to this C<Data::Money> object and returns a new
+C<Data::Money> object. You can supply either a number or a C<Data::Money> object.
+Note that this B<does not> modify the existing object.
+
+=cut
+
 sub subtract {
     my $self = shift;
     my $num = shift || 0;
@@ -210,6 +373,14 @@ sub subtract {
 
     return $self->clone(value => $self->value->copy->bsub($self->clone(value => $num)->value))
 }
+
+=head2 substract_in_place($num)
+
+Subtracts the specified amount to this C<Data::Money> object,modifying its value.
+You can supply either a number or a C<Data::Money> object. Note that this B<does>
+modify the existing object.
+
+=cut
 
 sub subtract_in_place {
     my ($self, $num) = @_;
@@ -226,6 +397,14 @@ sub subtract_in_place {
     return $self;
 }
 
+=head2 multiply($num)
+
+Multiplies the value of this C<Data::Money> object and returns a new C<Data::Money>
+object. You dcan dsupply either a number or a C<Data::Money> object. Note that this
+B<does not> modify the existing object.
+
+=cut
+
 sub multiply {
     my ($self, $num) = @_;
 
@@ -239,6 +418,14 @@ sub multiply {
 
     return $self->clone(value => $self->value->copy->bmul($self->clone(value => $num)->value))
 }
+
+=head2 multiply_in_place($num)
+
+Multiplies the  value of this C<Data::Money> object, modifying its value. You can
+supply  either a number or a C<Data::Money> object. Note that this B<does> modify
+the existing object.
+
+=cut
 
 sub multiply_in_place {
     my ($self, $num) = @_;
@@ -254,6 +441,14 @@ sub multiply_in_place {
 
     return $self;
 }
+
+=head2 divide($num)
+
+Divides the  value of this C<Data::Money> object and returns a new C<Data::Money>
+object. You can supply either a number or a C<Data::Money> object. Note that this
+B<does not> modify the existing object.
+
+=cut
 
 sub divide {
     my ($self, $num) = @_;
@@ -277,6 +472,14 @@ sub divide {
     return $self->clone(value => $val);
 }
 
+=head2 divide_in_place($num)
+
+Divides  the  value  of  this C<Data::Money> object, modifying its value. You can
+supply  either a number or a C<Data::Money> object. Note that this B<does> modify
+the existing object.
+
+=cut
+
 sub divide_in_place {
     my ($self, $num) = @_;
 
@@ -298,6 +501,13 @@ sub divide_in_place {
     return $self;
 }
 
+=head2 modulo($num)
+
+Performs the modulo operation on this C<Data::Money> object, returning a new C<Data::Money>
+object with the value of the remainder.
+
+=cut
+
 sub modulo {
     my ($self, $num) = @_;
 
@@ -314,6 +524,14 @@ sub modulo {
     $val = $self->value->copy->bmod($self->clone(value => $num)->value);
     return $self->clone(value => $val);
 }
+
+=head2 three_way_compare($num)
+
+Compares a C<Data::Money> object to another C<Data::Money> object, or anything it
+is capable of coercing - numbers, numerical strings, or L<Math::BigFloat> objects.
+Both numerical and string comparators work.
+
+=cut
 
 sub three_way_compare {
     my $self = shift;
@@ -391,281 +609,100 @@ sub _round {
     }
 }
 
-1;
-
-__END__
-
-=head1 NAME
-
-Data::Money - Money/currency with formatting and overloading.
-
-=head1 SYNOPSIS
-
-    use Data::Money;
-
-    my $price = Data::Money->new(value => 1.2. code => 'USD');
-    print $price;            # $1.20
-    print $price->code;      # USD
-    print $price->format;    # FMT_COMMON
-    print $price->as_string; # $1.20
-
-    # Overloading, returns new instance
-    my $m2 = $price + 1;
-    my $m3 = $price - 1;
-    my $m4 = $price * 1;
-    my $m5 = $price / 1;
-    my $m6 = $price % 1;
-
-    # Objects work too
-    my $m7 = $m2 + $m3;
-    my $m8 = $m2 - $m3;
-    my $m9 = $m2 * $m3;
-    my $m10 = $m2 / $m3;
-
-    # Modifies in place
-    $price += 1;
-    $price -= 1;
-    $price *= 1;
-    $price /= 1;
-
-    # Compares against numbers
-    if($m2 > 2)
-    if($m2 < 3)
-    if($m2 == 2.2)
-
-    # And strings
-    if($m2 gt '$2.00')
-    if($m2 lt '$3.00')
-    if($m2 eq '$2.20')
-
-    # and objects
-    if($m2 > $m3)
-    if($m3 lt $m2)
-
-    print $price->as_string('FMT_SYMBOL'); # $1.20
-
-=head1 DESCRIPTION
-
-The Data::Money module provides basic currency formatting and number handling
-via L<Math::BigFloat|Math::BigFloat>:
-
-    my $currency = Data::Money->new(value => 1.23);
-
-Each Data::Money object will stringify to the original value except in string
-context, where it stringifies to the format specified in C<format>.
-
-=head1 MOTIVATION
-
-Data::Money was created to make it easy to use different currencies (leveraging
-existing work in C<Locale::Currency> and L<Moose|Moose>), to allow math operations
-with proper rounding (via L<Math::BigFloat|Math::BigFloat>) and formatting via
-L<Locale::Currency::Format|Locale::Currency::Format>.
-
 =head1 OPERATOR OVERLOADING
 
-Data::Money overrides some operators.  It is important to note which
-operators change the object's value and which return new ones.  All
-operators accept either a Data::Money argument or a normal number via
-scalar, and will die if the currency types mismatch.
+C<Data::Money> overrides  some operators. It is important to note which operators
+change the object's value and which return new ones.All operators accept either a
+C<Data::Money> argument / a normal number via scalar and will die if the currency
+types mismatch.
 
-Data::Money overloads the following operators:
+C<Data::Money> overloads the following operators:
 
 =over 4
 
 =item +
 
-Handled by the C<add> method.  Returns a new Data::Money object.
+Handled by the C<add> method.  Returns a new C<Data::Money> object.
 
 =item -
 
-Handled by the C<subtract> method.  Returns a new Data::Money object.
+Handled by the C<subtract> method.  Returns a new C<Data::Money> object.
 
 =item S< >*
 
-Handled by the C<multiply> method. Returns a new Data::Money object.
+Handled by the C<multiply> method. Returns a new C<Data::Money> object.
 
 =item /
 
-Handled by the C<divide> method. Returns a new Data::Money object.
+Handled by the C<divide> method. Returns a new C<Data::Money> object.
 
 =item +=
 
-Handled by the C<add_in_place> method.  Modifies the left-hand object's value.
-Works with either a Data::Money argument or a normal number.
+Handled by the C<add_in_place()> method.  Modifies the  left-hand object's value.
+Works with either a C<Data::Money> argument or a normal number.
 
 =item -=
 
-Handled by the C<subtract_in_place> method.  Modifies the left-hand object's value.
-Works with either a Data::Money argument or a normal number.
+Handled  by  the  C<subtract_in_place()> method. Modifies the  left-hand object's
+value. Works with either a C<Data::Money> argument or a normal number.
 
 =item *=
 
-Handled by the C<multiply_in_place> method.  Modifies the left-hand object's value.
-Works with either a Data::Money argument or a normal number.
+Handled by  the  C<multiply_in_place()> method.  Modifies the  left-hand object's
+value. Works with either a C<Data::Money> argument or a normal number.
 
 =item /=
 
-Handled by the C<divide_in_place> method.  Modifies the left-hand object's value.
-Works with either a Data::Money argument or a normal number.
+Handled  by  the  C<divide_in_place()>  method.  Modifies  the left-hand object's
+value. Works with either a C<Data::Money> argument or a normal number.
 
 =item <=>
 
-Performs a three way comparsion. Works with either a Data::Money argument or a
+Performs  a  three way comparsion. Works with either a Data::Money  argument or a
 normal number.
-
 
 =back
 
-=head1 ATTRIBUTES
-
-=head2 code
-
-Gets/sets the three letter currency code for the current currency object.
-Defaults to USD
-
-=head2 format
-
-Gets/sets the format to be used when C<as_string> is called. See
-L<Locale::Currency::Format|Locale::Currency::Format> for the available
-formatting options.  Defaults to C<FMT_COMMON>.
-
-=head2 name
-
-Returns the currency name for the current objects currency code. If no
-currency code is set the method will die.
-
-=head2 value
-
-The amount of money/currency.  Defaults to 0.
-
-=head1 METHODS
-
-=head2 add($amount)
-
-Adds the specified amount to this Data::Money object and returns a new
-Data::Money object.  You can supply either a number of a Data::Money
-object.  Note that this B<does not> modify the existing object.
-
-=head2 add_in_place($amount)
-
-Adds the specified amount to this Data::Money object, modifying its value.
-You can supply either a number of a Data::Money object.  Note that this
-B<does> modify the existing object.
-
-=head2 as_int
-
-Returns the object's value "in pennies" (in the US at least).  It
-strips the value of formatting using C<as_float> and of any decimals.
-
-=head2 as_float
-
-Returns objects value without any formatting.
-
-=head2 subtract($amount)
-
-Subtracts the specified amount to this Data::Money object and returns a new
-Data::Money object. You can supply either a number of a Data::Money
-object. Note that this B<does not> modify the existing object.
-
-=head2 subtract_in_place($amount)
-
-Subtracts the specified amount to this Data::Money object, modifying its
-value. You can supply either a number of a Data::Money object. Note that
-this B<does> modify the existing object.
-
-=head2 multiply($amount)
-
-Multiplies the value of this Data::Money object and returns a new
-Data::Money object. You can supply either a number of a Data::Money
-object. Note that this B<does not> modify the existing object.
-
-=head2 multiply_in_place($amount)
-
-Multiplies the value of this Data::Money object, modifying its value. You
-can supply either a number of a Data::Money object. Note that this B<does>
-modify the existing object.
-
-=head2 divide($amount)
-
-Divides the value of this Data::Money object and returns a new
-Data::Money object. You can supply either a number of a Data::Money
-object. Note that this B<does not> modify the existing object.
-
-=head2 divide_in_place($amount)
-
-Divides the value of this Data::Money object, modifying its value. You can
-supply either a number of a Data::Money object. Note that this B<does>
-modify the existing object.
-
-=head2 modulo
-
-Performs the modulo operation on this Data::Money object, returning a new
-Data::Money object with the value of the remainder.
-
-=head2 three_way_compare
-
-Compares a Data::Money object to another Data::Money object, or anything it is
-capable of coercing - numbers, numerical strings, or Math::BigFloat objects. Both
-numerical and string comparators work.
-
-=head2 negate
-
-Performs the negation operation, returning a new Data::Money object with the opposite
-value (1 to -1, -2 to 2, etc).
-
-=head2 absolute
-
-Returns a new Data::Money object with the value set to the absolute value of the
-original.
-
-=head2 clone(%params)
-
-Returns a clone (new instance) of this Data::Money object.  You may optionally
-specify some of the attributes to overwrite.
-
-  $curr->clone({ value => 100 }); # Clones all fields but changes value to 100
-
-See L<MooseX::Clone|MooseX::Clone> for more information.
-
-=head2 stringify
-
-Sames as C<as_string>.
-
-=head2 as_string
-
-Returns the current objects value as a formatted currency string.
-
 =head1 SEE ALSO
 
-L<Locale::Currency|Locale::Currency>, L<Locale::Currency::Format|Locale::Currency::Format>,
+=over 4
+
+=item L<Locale::Currency>
+
+=item L<Locale::Currency::Format>
+
+=back
 
 =head1 ACKNOWLEDGEMENTS
 
-This module was originally based on L<Data::Currency|Data::Currency> by Christopher H. Laco
-but I opted to fork and create a whole new module because my work was wildly
-different from the original. I decided it was better to make a new module than
-to break back compat and surprise users. Many thanks to him for the great
-module.
+This module was originally based on L<Data::Currency> by Christopher H. Laco but I
+I opted to fork and create a whole new module because my work was wildly different
+from the original. I decided it was better to make a new module than to break back
+compat and surprise users. Many thanks to him for the great module.
 
-Inspiration and ideas were also drawn from L<Math::Currency|Math::Currency> and
-L<Math::BigFloat|Math::BigFloat>.
+Inspiration and ideas were also drawn from L<Math::Currency> and L<Math::BigFloat>.
 
-Major contributions (more overloaded operators, disallowing operations on
-mismatched currences, absolute value, negation and unit tests) from
-Andrew Nelson C<< <anelson@cpan.org> >>.
-
-Major contributions (more overloaded operators, disallowing operations on
-mismatched currences, absolute value, negation and unit tests) from
-Andrew Nelson.
+Major contributions (more overloaded operators, disallowing operations on mismatched
+currences, absolute value, negation and unit tests) from Andrew Nelson C<< <anelson@cpan.org> >>.
 
 =head1 AUTHOR
 
 Cory G Watson, C<< <gphat at cpan.org> >>
 
+Currently maintained by Mohammad S Anwar (MANWAR) C<< <mohammad.anwar at yahoo.com> >>
+
+=head1 REPOSITORY
+
+L<https://github.com/manwar/Data-Money>
+
 Copyright 2010 Cory Watson
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+This program is free software; you can redistribute it and/or modify it under the
+terms of either: the GNU General Public License as published by the Free Software
+Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See L<here|http://dev.perl.org/licenses> for more information.
+
+=cut
+
+1; # End of Data::Money
