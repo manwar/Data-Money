@@ -1,11 +1,11 @@
-package Data::Money::Exception;
+package Data::Money::Exception::InvalidCurrencyFormat;
 
-$Data::Money::Exception::VERSION   = '0.08';
-$Data::Money::Exception::AUTHORITY = 'cpan:GPHAT';
+$Data::Money::Exception::InvalidCurrencyFormat::VERSION   = '0.08';
+$Data::Money::Exception::InvalidCurrencyFormat::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
 
-Data::Money::Exception - Exception handler for Data::Money.
+Data::Money::Exception::InvalidCurrencyFormat - Exception handle for 'invalid currency format'.
 
 =head1 VERSION
 
@@ -16,18 +16,12 @@ Version 0.08
 use 5.006;
 use Data::Dumper;
 
-use Moo::Role;
+use Moo;
 use namespace::clean;
-requires 'error';
-with 'Throwable';
 
-use overload q{""} => 'as_string', fallback => 1;
+has error => (is => 'ro', default => sub { 'Invalid currency format.' });
 
-sub as_string {
-    my ($self) = @_;
-
-    return $self->error;
-}
+with 'Data::Money::Exception';
 
 =head1 DESCRIPTION
 
@@ -36,8 +30,6 @@ B<FOR INTERNAL USE ONLY>
 =head1 AUTHOR
 
 Cory G Watson, C<< <gphat at cpan.org> >>
-
-Currently maintained by Mohammad S Anwar (MANWAR) C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
@@ -55,4 +47,4 @@ See L<here|http://dev.perl.org/licenses> for more information.
 
 =cut
 
-1; # End of Data::Money::Exception
+1; # End of Data::Money::Exception::InvalidCurrencyFormat

@@ -1,4 +1,4 @@
-use Test::More; # tests => 8;
+use Test::More tests => 8;
 use strict;
 use Encode;
 
@@ -20,16 +20,16 @@ use Data::Money;
     ok($@ =~ /Excessive precision for this currency type/, 'JPY has no decimal places');
 
     my $bah = Data::Money->new(code => 'BHD', value => 1);
-    #cmp_ok($bah->as_string, 'eq', 'BD 1.000', 'BHD formatting');
+    cmp_ok($bah->as_string, 'eq', 'BD 1.000', 'BHD formatting');
 
-    #my $bah2 = Data::Money->new(code => 'BHD', value => 1.345);
-    #cmp_ok($bah2->as_string, 'eq', 'BD 1.345', 'BHD formatting');
+    my $bah2 = Data::Money->new(code => 'BHD', value => 1.345);
+    cmp_ok($bah2->as_string, 'eq', 'BD 1.345', 'BHD formatting');
 
-    #my $bah3 = Data::Money->new(code => 'BHD', value => 1.34);
-    #cmp_ok($bah3->as_string, 'eq', 'BD 1.340', 'BHD formatting');
+    my $bah3 = Data::Money->new(code => 'BHD', value => 1.34);
+    cmp_ok($bah3->as_string, 'eq', 'BD 1.340', 'BHD formatting');
 
-    #eval { Data::Money->new(code => 'BHD', value => 1.3456); };
-    #ok($@ =~ /Excessive precision for this currency type/, 'BHD only has three decimal places');
+    eval { Data::Money->new(code => 'BHD', value => 1.3456); };
+    ok($@ =~ /Excessive precision for this currency type/, 'BHD only has three decimal places');
 
 };
 

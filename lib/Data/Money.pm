@@ -19,7 +19,10 @@ use namespace::clean;
 
 use Data::Dumper;
 use Math::BigFloat;
-use Data::Money::Exception;
+use Data::Money::Exception::MismatchCurrencyType;
+use Data::Money::Exception::ExcessivePrecision;
+use Data::Money::Exception::InvalidCurrencyCode;
+use Data::Money::Exception::InvalidCurrencyFormat;
 use Locale::Currency::Format;
 use Locale::Currency qw(code2currency);
 
@@ -43,15 +46,13 @@ use overload
     'neg'   => \&negate,
     fallback => 1;
 
-
 my $Amount = sub {
     my ($arg) = @_;
 
     return Math::BigFloat->new(0) unless defined $arg;
 
-    if (ref($arg) eq 'Data::Money') {
-        return Math::BigFloat->new($arg->value);
-    }
+    return Math::BigFloat->new($arg->value)
+        if (ref($arg) eq 'Data::Money');
 
     $arg =~ tr/-()0-9.//cd;
     if ($arg) {
@@ -64,7 +65,7 @@ my $Amount = sub {
 my $CurrencyCode = sub {
     my ($arg) = @_;
 
-    die 'String is not a valid 3 letter currency code.'
+    Data::Money::Exception::InvalidCurrencyCode->throw
         unless (defined $arg
                 || ($arg =~ /^[A-Z]{3}$/mxs && defined code2currency($arg)));
 };
@@ -80,7 +81,7 @@ my $Format = sub {
         'FMT_SYMBOL'   => 1
     };
 
-    die "Invalid Format [$arg]."
+    Data::Money::Exception::InvalidCurrencyFormat->throw
         unless (defined $arg || exists $format->{uc($arg)});
 };
 
@@ -160,8 +161,7 @@ sub BUILD {
     $exp = $dec->exponent->babs if ($dec);
     my $prec = Math::BigInt->new($self->_decimal_precision);
 
-    Data::Money::Exception->throw(error => 'Excessive precision for this currency type')
-        if ($exp > $prec);
+    Data::Money::Exception::ExcessivePrecision->throw if ($exp > $prec);
 }
 
 =head1 METHODS
@@ -284,9 +284,8 @@ sub add {
     my $num  = shift || 0;
 
     if (ref($num) eq 'Data::Money') {
-        if ($self->code ne $num->code) {
-            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
-        }
+        Data::Money::Exception::MismatchCurrencyType->throw
+            if ($self->code ne $num->code);
 
         return $self->clone(value => $self->value->copy->badd($num->value));
     }
@@ -306,9 +305,8 @@ sub add_in_place {
     my ($self, $num) = @_;
 
     if (ref($num) eq 'Data::Money') {
-        if ($self->code ne $num->code) {
-            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
-        }
+        Data::Money::Exception::MismatchCurrencyType->throw
+            if ($self->code ne $num->code);
 
         $self->value($self->value->copy->badd($num->value));
     } else {
@@ -324,21 +322,20 @@ Returns C<Data::Money> object as string.There is an alias C<stringify()> as well
 
 =cut
 
-
 *as_string = \&stringify;
-
 sub stringify {
     my $self   = shift;
     my $format = shift || $self->format;
 
-    my $code = $self->code;
-
     ## funky eval to get string versions of constants back into the values
     eval '$format = Locale::Currency::Format::' .  $format;
 
-    unless (_is_CurrencyCode($code)) {
-        Data::Money::Exception->throw(error => 'Invalid currency code:  ' . ($code || 'undef'));
-    }
+    my $code = $self->code;
+    Data::Money::Exception::InvalidCurrencyCode->throw(
+        {
+            error => 'Invalid currency code:  ' . ($code || 'undef')
+        })
+        unless (_is_CurrencyCode($code));
 
     my $utf8 = _to_utf8(
         Locale::Currency::Format::currency_format($code, $self->absolute->as_float, $format)
@@ -361,12 +358,11 @@ Note that this B<does not> modify the existing object.
 
 sub subtract {
     my $self = shift;
-    my $num = shift || 0;
+    my $num  = shift || 0;
 
     if (ref($num) eq 'Data::Money') {
-        if ($self->code ne $num->code) {
-            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
-        }
+        Data::Money::Exception::MismatchCurrencyType->throw
+            if ($self->code ne $num->code);
 
         return $self->clone(value => $self->value->copy->bsub($num->value));
     }
@@ -386,9 +382,9 @@ sub subtract_in_place {
     my ($self, $num) = @_;
 
     if (ref($num) eq 'Data::Money') {
-        if ($self->code ne $num->code) {
-            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
-        }
+        Data::Money::Exception::MismatchCurrencyType->throw
+            if ($self->code ne $num->code);
+
         $self->value($self->value->copy->bsub($num->value));
     } else {
         $self->value($self->value->copy->bsub($self->clone(value => $num)->value));
@@ -409,9 +405,8 @@ sub multiply {
     my ($self, $num) = @_;
 
     if (ref($num) eq 'Data::Money') {
-        if ($self->code ne $num->code) {
-            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
-        }
+        Data::Money::Exception::MismatchCurrencyType->throw
+            if ($self->code ne $num->code);
 
         return $self->clone(value => $self->value->copy->bmul($num->value));
     }
@@ -431,9 +426,9 @@ sub multiply_in_place {
     my ($self, $num) = @_;
 
     if (ref($num) eq 'Data::Money') {
-        if ($self->code ne $num->code) {
-            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
-        }
+        Data::Money::Exception::MismatchCurrencyType->throw
+            if ($self->code ne $num->code);
+
         $self->value($self->value->copy->bmul($num->value));
     } else {
         $self->value($self->value->copy->bmul($self->clone(value => $num)->value));
@@ -455,9 +450,8 @@ sub divide {
 
     my $val;
     if (ref($num) eq 'Data::Money') {
-        if ($self->code ne $num->code) {
-            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
-        }
+        Data::Money::Exception::MismatchCurrencyType->throw
+            if ($self->code ne $num->code);
 
         $val = $self->value->copy->bdiv($num->value);
         my $prec = Locale::Currency::Format::decimal_precision($self->code);
@@ -484,15 +478,15 @@ sub divide_in_place {
     my ($self, $num) = @_;
 
     if (ref($num) eq 'Data::Money') {
-        if ($self->code ne $num->code) {
-            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
-        }
+        Data::Money::Exception::MismatchCurrencyType->throw
+            if ($self->code ne $num->code);
+
         my $val  = $self->value->copy->bdiv($num->value);
         my $prec = Locale::Currency::Format::decimal_precision($self->code);
         $val = sprintf('%.0'.$prec.'f', _round($val, $prec*-1));
         $self->value($val);
     } else {
-        my $val = $self->value->copy->bdiv($self->clone(value => $num));
+        my $val  = $self->value->copy->bdiv($self->clone(value => $num));
         my $prec = Locale::Currency::Format::decimal_precision($self->code);
         $val = sprintf('%.0'.$prec.'f', _round($val, $prec*-1));
         $self->value($val);
@@ -513,9 +507,8 @@ sub modulo {
 
     my $val;
     if (ref($num) eq 'Data::Money') {
-        if ($self->code ne $num->code) {
-            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
-        }
+        Data::Money::Exception::MismatchCurrencyType->throw
+            if ($self->code ne $num->code);
 
         $val = $self->value->copy->bmod($num->value);
         return $self->clone(value => $val);
@@ -547,9 +540,11 @@ sub three_way_compare {
         $y = $self->clone(value => $num);
     }
 
-    if ($self->code ne $y->code) {
-        Data::Money::Exception->throw(error => 'unable to compare different currency types');
-    }
+    Data::Money::Exception::MismatchCurrencyType->throw(
+        {
+            error => 'unable to compare different currency types'
+        })
+        if ($self->code ne $y->code);
 
     return $self->value->copy->bfround(0 - $self->_decimal_precision) <=> $y->value->copy->bfround(0 - $self->_decimal_precision);
 }
@@ -562,14 +557,16 @@ sub _decimal_precision {
     my ($self, $code) = @_;
 
     $code ||= $self->code;
-    my $format;
 
+    my $format;
     ## funky eval to get string versions of constants back into the values
     eval '$format = Locale::Currency::Format::' .  $self->format;
 
-    unless (_is_CurrencyCode($code)) {
-        Data::Money::Exception->throw(error => 'Invalid currency code:  ' . ($code || 'undef'));
-    }
+    Data::Money::Exception::InvalidCurrencyCode->throw(
+        {
+            error => 'Invalid currency code:  ' . ($code || 'undef')
+        })
+        unless (_is_CurrencyCode($code));
 
     return Locale::Currency::Format::decimal_precision($code) || 0;
 }

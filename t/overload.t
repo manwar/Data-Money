@@ -1,4 +1,4 @@
-use Test::More; # tests => 74;
+use Test::More tests => 74;
 use strict;
 
 use Data::Money;

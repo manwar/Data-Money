@@ -1,6 +1,10 @@
 Changes
 lib/Data/Money.pm
 lib/Data/Money/Exception.pm
+lib/Data/Money/Exception/ExcessivePrecision.pm
+lib/Data/Money/Exception/InvalidCurrencyCode.pm
+lib/Data/Money/Exception/InvalidCurrencyFormat.pm
+lib/Data/Money/Exception/MismatchCurrencyType.pm
 Makefile.PL
 LICENSE
 MANIFEST
