@@ -6,8 +6,10 @@ LICENSE
 MANIFEST
 MANIFEST.SKIP
 README
+t/00-load.t
+t/pod.t
+t/manifest.t
 t/currency.t
 t/format_stripping.t
 t/overload.t
-t/format_stripping.t
 t/locale.t
