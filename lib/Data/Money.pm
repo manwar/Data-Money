@@ -448,22 +448,16 @@ B<does not> modify the existing object.
 sub divide {
     my ($self, $num) = @_;
 
-    my $val;
     if (ref($num) eq 'Data::Money') {
         Data::Money::Exception::MismatchCurrencyType->throw
             if ($self->code ne $num->code);
 
-        $val = $self->value->copy->bdiv($num->value);
-        my $prec = Locale::Currency::Format::decimal_precision($self->code);
-        $val = sprintf('%.0'.$prec.'f', _round($val, $prec*-1));
-        return $self->clone(value => $val);
+        my $val = $self->value->copy->bdiv($num->value);
+        return $self->clone(value => $self->_round_up($val));
     }
 
-    $val = $self->value->copy->bdiv($self->clone(value => $num)->value);
-    my $prec = Locale::Currency::Format::decimal_precision($self->code);
-    $val = sprintf('%.0'.$prec.'f', _round($val, $prec*-1));
-
-    return $self->clone(value => $val);
+    my $val = $self->value->copy->bdiv($self->clone(value => $num)->value);
+    return $self->clone(value => $self->_round_up($val));
 }
 
 =head2 divide_in_place($num)
@@ -477,20 +471,17 @@ the existing object.
 sub divide_in_place {
     my ($self, $num) = @_;
 
+    my $val;
     if (ref($num) eq 'Data::Money') {
         Data::Money::Exception::MismatchCurrencyType->throw
             if ($self->code ne $num->code);
 
-        my $val  = $self->value->copy->bdiv($num->value);
-        my $prec = Locale::Currency::Format::decimal_precision($self->code);
-        $val = sprintf('%.0'.$prec.'f', _round($val, $prec*-1));
-        $self->value($val);
+        $val = $self->value->copy->bdiv($num->value);
     } else {
-        my $val  = $self->value->copy->bdiv($self->clone(value => $num));
-        my $prec = Locale::Currency::Format::decimal_precision($self->code);
-        $val = sprintf('%.0'.$prec.'f', _round($val, $prec*-1));
-        $self->value($val);
+        $val = $self->value->copy->bdiv($self->clone(value => $num));
     }
+
+    $self->value($self->_round_up($val));
 
     return $self;
 }
@@ -505,16 +496,15 @@ object with the value of the remainder.
 sub modulo {
     my ($self, $num) = @_;
 
-    my $val;
     if (ref($num) eq 'Data::Money') {
         Data::Money::Exception::MismatchCurrencyType->throw
             if ($self->code ne $num->code);
 
-        $val = $self->value->copy->bmod($num->value);
+        my $val = $self->value->copy->bmod($num->value);
         return $self->clone(value => $val);
     }
 
-    $val = $self->value->copy->bmod($self->clone(value => $num)->value);
+    my $val = $self->value->copy->bmod($self->clone(value => $num)->value);
     return $self->clone(value => $val);
 }
 
@@ -530,23 +520,23 @@ sub three_way_compare {
     my $self = shift;
     my $num  = shift || 0;
 
-    my $y;
+    my $other;
     if (ref($num) eq 'Data::Money') {
-        $y = $num;
+        $other = $num;
     } else {
         # we clone here to ensure that if we're comparing a number to
         # an object, that the currency codes match (and we don't just
         # get the default).
-        $y = $self->clone(value => $num);
+        $other = $self->clone(value => $num);
     }
 
     Data::Money::Exception::MismatchCurrencyType->throw(
         {
-            error => 'unable to compare different currency types'
+            error => 'Unable to compare different currency types.'
         })
-        if ($self->code ne $y->code);
+        if ($self->code ne $other->code);
 
-    return $self->value->copy->bfround(0 - $self->_decimal_precision) <=> $y->value->copy->bfround(0 - $self->_decimal_precision);
+    return $self->value->copy->bfround(0 - $self->_decimal_precision) <=> $other->value->copy->bfround(0 - $self->_decimal_precision);
 }
 
 #
@@ -569,6 +559,13 @@ sub _decimal_precision {
         unless (_is_CurrencyCode($code));
 
     return Locale::Currency::Format::decimal_precision($code) || 0;
+}
+
+sub _round_up {
+    my ($self, $val) = @_;
+
+    my $prec = Locale::Currency::Format::decimal_precision($self->code);
+    return sprintf('%.0'.$prec.'f', _round($val, $prec*-1));
 }
 
 sub _to_utf8 {
