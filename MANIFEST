@@ -1,0 +1,13 @@
+Changes
+lib/Data/Money.pm
+lib/Data/Money/Exception.pm
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+t/currency.t
+t/format_stripping.t
+t/overload.t
+t/format_stripping.t
+t/locale.t

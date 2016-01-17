@@ -1,0 +1,28 @@
+Revision history for Data::Money
+
+0.07  2014-01-11
+      - Update types to work with current Moose versions
+
+0.06
+      - Remove a loose dependency in a test that was causing CPANtester failures.
+
+0.05
+      - Changed croak() to Throwable exceptions
+      - Abandon rounding for enforced precision
+
+0.04
+      - Added coercion from undef
+      - Fixed coercion from an empty string
+
+0.03  2010-10-05
+      - Added overloads for all basic arithmetic operations to disallow mismatched currency
+      - Add an overloaded three-way comparator and allow coercion from itself
+      - Add absolute value
+      - Add negation
+      - More unit tests
+
+0.02  2010-08-13
+      - Strip out formatting (holophrastic)
+
+0.01  2010-03-28
+      - First version, released on an unsuspecting world.
