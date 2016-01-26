@@ -1,5 +1,9 @@
 Revision history for Data::Money
 
+0.09  2016-01-26 MANWAR
+      - Renamed Data::Money::Exception to Data::Money::BaseException to get around permission issue.
+      - Tidied up Changes file.
+
 0.08  2016-01-26 MANWAR
       - Tweaked unit test (t/overload.t)
       - Removed duplicate entry from the MANIFEST file.
@@ -12,29 +16,29 @@ Revision history for Data::Money
       - Downgrade dependency to Moo from Moose.
       - Fixed failing unit tests.
 
-0.07  2014-01-11
+0.07  2014-01-11 GPHAT
       - Update types to work with current Moose versions
 
-0.06
+0.06  2012-06-28 ANELSON
       - Remove a loose dependency in a test that was causing CPANtester failures.
 
-0.05
+0.05  2012-06-21 ANELSON
       - Changed croak() to Throwable exceptions
       - Abandon rounding for enforced precision
 
-0.04
+0.04  2010-10-15 ANELSON
       - Added coercion from undef
       - Fixed coercion from an empty string
 
-0.03  2010-10-05
+0.03  2010-10-05 GPHAT
       - Added overloads for all basic arithmetic operations to disallow mismatched currency
       - Add an overloaded three-way comparator and allow coercion from itself
       - Add absolute value
       - Add negation
       - More unit tests
 
-0.02  2010-08-13
+0.02  2010-08-13 GPHAT
       - Strip out formatting (holophrastic)
 
-0.01  2010-03-28
+0.01  2010-03-28 GPHAT
       - First version, released on an unsuspecting world.

@@ -1,15 +1,15 @@
-package Data::Money::Exception::MismatchCurrencyType;
+package Data::Money::BaseException::InvalidCurrencyCode;
 
-$Data::Money::Exception::MismatchCurrencyType::VERSION   = '0.08';
-$Data::Money::Exception::MismatchCurrencyType::AUTHORITY = 'cpan:GPHAT';
+$Data::Money::BaseException::InvalidCurrencyCode::VERSION   = '0.09';
+$Data::Money::BaseException::InvalidCurrencyCode::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
 
-Data::Money::Exception::MismatchCurrencyType - Exception handle for 'mismatch currency type'.
+Data::Money::BaseException::InvalidCurrencyCode - Exception handle for 'invalid currency code'.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -19,9 +19,9 @@ use Data::Dumper;
 use Moo;
 use namespace::clean;
 
-has error => (is => 'ro', default => sub { 'unable to perform arithmetic on different currency types' });
+has error => (is => 'ro', default => sub { 'String is not a valid 3 letter currency code.' });
 
-with 'Data::Money::Exception';
+with 'Data::Money::BaseException';
 
 =head1 DESCRIPTION
 
@@ -49,4 +49,4 @@ See L<here|http://dev.perl.org/licenses> for more information.
 
 =cut
 
-1; # End of Data::Money::Exception::MismatchCurrencyType
+1; # End of Data::Money::BaseException::InvalidCurrencyCode

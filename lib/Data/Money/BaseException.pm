@@ -1,27 +1,33 @@
-package Data::Money::Exception::ExcessivePrecision;
+package Data::Money::BaseException;
 
-$Data::Money::Exception::ExcessivePrecision::VERSION   = '0.08';
-$Data::Money::Exception::ExcessivePrecision::AUTHORITY = 'cpan:GPHAT';
+$Data::Money::BaseException::VERSION   = '0.09';
+$Data::Money::BaseException::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
 
-Data::Money::Exception::ExcessivePrecision - Exception handle for 'excessive precision'.
+Data::Money::BaseException - Exception handler for Data::Money.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
 use 5.006;
 use Data::Dumper;
 
-use Moo;
+use Moo::Role;
 use namespace::clean;
+requires 'error';
+with 'Throwable';
 
-has error => (is => 'ro', default => sub { 'Excessive precision for this currency type' });
+use overload q{""} => 'as_string', fallback => 1;
 
-with 'Data::Money::Exception';
+sub as_string {
+    my ($self) = @_;
+
+    return $self->error;
+}
 
 =head1 DESCRIPTION
 
@@ -49,4 +55,4 @@ See L<here|http://dev.perl.org/licenses> for more information.
 
 =cut
 
-1; # End of Data::Money::Exception::ExcessivePrecision
+1; # End of Data::Money::BaseException

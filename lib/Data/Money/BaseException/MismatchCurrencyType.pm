@@ -1,33 +1,27 @@
-package Data::Money::Exception;
+package Data::Money::BaseException::MismatchCurrencyType;
 
-$Data::Money::Exception::VERSION   = '0.08';
-$Data::Money::Exception::AUTHORITY = 'cpan:GPHAT';
+$Data::Money::BaseException::MismatchCurrencyType::VERSION   = '0.09';
+$Data::Money::BaseException::MismatchCurrencyType::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
 
-Data::Money::Exception - Exception handler for Data::Money.
+Data::Money::BaseException::MismatchCurrencyType - Exception handle for 'mismatch currency type'.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
 use 5.006;
 use Data::Dumper;
 
-use Moo::Role;
+use Moo;
 use namespace::clean;
-requires 'error';
-with 'Throwable';
 
-use overload q{""} => 'as_string', fallback => 1;
+has error => (is => 'ro', default => sub { 'unable to perform arithmetic on different currency types' });
 
-sub as_string {
-    my ($self) = @_;
-
-    return $self->error;
-}
+with 'Data::Money::BaseException';
 
 =head1 DESCRIPTION
 
@@ -55,4 +49,4 @@ See L<here|http://dev.perl.org/licenses> for more information.
 
 =cut
 
-1; # End of Data::Money::Exception
+1; # End of Data::Money::BaseException::MismatchCurrencyType

@@ -1,15 +1,15 @@
-package Data::Money::Exception::InvalidCurrencyCode;
+package Data::Money::BaseException::ExcessivePrecision;
 
-$Data::Money::Exception::InvalidCurrencyCode::VERSION   = '0.08';
-$Data::Money::Exception::InvalidCurrencyCode::AUTHORITY = 'cpan:GPHAT';
+$Data::Money::BaseException::ExcessivePrecision::VERSION   = '0.09';
+$Data::Money::BaseException::ExcessivePrecision::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
 
-Data::Money::Exception::InvalidCurrencyCode - Exception handle for 'invalid currency code'.
+Data::Money::BaseException::ExcessivePrecision - Exception handle for 'excessive precision'.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -19,9 +19,9 @@ use Data::Dumper;
 use Moo;
 use namespace::clean;
 
-has error => (is => 'ro', default => sub { 'String is not a valid 3 letter currency code.' });
+has error => (is => 'ro', default => sub { 'Excessive precision for this currency type' });
 
-with 'Data::Money::Exception';
+with 'Data::Money::BaseException';
 
 =head1 DESCRIPTION
 
@@ -49,4 +49,4 @@ See L<here|http://dev.perl.org/licenses> for more information.
 
 =cut
 
-1; # End of Data::Money::Exception::InvalidCurrencyCode
+1; # End of Data::Money::BaseException::ExcessivePrecision

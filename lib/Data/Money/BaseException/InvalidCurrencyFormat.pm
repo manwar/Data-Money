@@ -1,15 +1,15 @@
-package Data::Money::Exception::InvalidCurrencyFormat;
+package Data::Money::BaseException::InvalidCurrencyFormat;
 
-$Data::Money::Exception::InvalidCurrencyFormat::VERSION   = '0.08';
-$Data::Money::Exception::InvalidCurrencyFormat::AUTHORITY = 'cpan:GPHAT';
+$Data::Money::BaseException::InvalidCurrencyFormat::VERSION   = '0.09';
+$Data::Money::BaseException::InvalidCurrencyFormat::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
 
-Data::Money::Exception::InvalidCurrencyFormat - Exception handle for 'invalid currency format'.
+Data::Money::BaseException::InvalidCurrencyFormat - Exception handle for 'invalid currency format'.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -21,7 +21,7 @@ use namespace::clean;
 
 has error => (is => 'ro', default => sub { 'Invalid currency format.' });
 
-with 'Data::Money::Exception';
+with 'Data::Money::BaseException';
 
 =head1 DESCRIPTION
 
@@ -47,4 +47,4 @@ See L<here|http://dev.perl.org/licenses> for more information.
 
 =cut
 
-1; # End of Data::Money::Exception::InvalidCurrencyFormat
+1; # End of Data::Money::BaseException::InvalidCurrencyFormat
