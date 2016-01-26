@@ -1,5 +1,17 @@
 Revision history for Data::Money
 
+0.08  2016-01-26 MANWAR
+      - Tweaked unit test (t/overload.t)
+      - Removed duplicate entry from the MANIFEST file.
+      - Added standard unit test scripts 00-load.t, pod.t and manifest.t.
+      - Added pod document to the package Data::Money::Exception.
+      - Added section "LICENSE AND COPYRIGHT".
+      - Updated README.
+      - Removed dependency on Check::ISA.
+      - Tidied up pod document.
+      - Downgrade dependency to Moo from Moose.
+      - Fixed failing unit tests.
+
 0.07  2014-01-11
       - Update types to work with current Moose versions
 
