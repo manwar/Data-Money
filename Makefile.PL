@@ -24,6 +24,7 @@ WriteMakefile(
         'Moo'                      => '2.000000',
         'namespace::clean'         => '0.24',
         'Throwable'                => 0,
+        'Math::BigFloat'           => '1.999704',
         'Locale::Currency'         => '2.07',
         'Locale::Currency::Format' => '1.22',
     },

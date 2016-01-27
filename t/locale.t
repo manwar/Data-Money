@@ -1,5 +1,6 @@
-use Test::More tests => 8;
+use Test::More;
 use strict;
+use warnings;
 use Encode;
 
 use Test::utf8;

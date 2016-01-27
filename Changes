@@ -1,5 +1,10 @@
 Revision history for Data::Money
 
+0.10  2016-01-27 MANWAR
+      - Added prereqs Math::BigFloat v1.999704.
+      - Added missing 'use warnings;' statement  to some of the test scripts.
+      - Updated test scripts w.r.t the change in package name Data::Money::BaseException.
+
 0.09  2016-01-26 MANWAR
       - Renamed Data::Money::Exception to Data::Money::BaseException to get around permission issue.
       - Tidied up Changes file.

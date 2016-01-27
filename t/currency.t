@@ -1,5 +1,6 @@
-use Test::More; # tests => 12;
+use Test::More;
 use strict;
+use warnings;
 use Encode;
 
 use Test::utf8;
@@ -35,8 +36,8 @@ use Data::Money;
 };
 
 ## unknown code
-#{
-#    dies_ok { Data::Money->new(code => 'OMG') } 'unknown currency code';
-#}
+{
+    dies_ok { Data::Money->new(code => 'OMG') } 'unknown currency code';
+}
 
 done_testing;
