@@ -1,5 +1,10 @@
 Revision history for Data::Money
 
+0.11  2016-01-28 MANWAR
+      - Removed reference to 'Moose' from the pod document as it is no longer
+        dependent on it. It has been upgraded to use 'Moo' instead since v0.08
+        or above.
+
 0.10  2016-01-27 MANWAR
       - Added prereqs Math::BigFloat v1.999704.
       - Added missing 'use warnings;' statement  to some of the test scripts.

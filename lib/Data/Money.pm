@@ -1,6 +1,6 @@
 package Data::Money;
 
-$Data::Money::VERSION   = '0.10';
+$Data::Money::VERSION   = '0.11';
 $Data::Money::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Data::Money - Money/currency with formatting and overloading.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
@@ -27,23 +27,23 @@ use Locale::Currency::Format;
 use Locale::Currency qw(code2currency);
 
 use overload
-    '+'     => \&add,
-    '-'     => \&subtract,
-    '*'     => \&multiply,
-    '/'     => \&divide,
-    '%'     => \&modulo,
-    '+='    => \&add_in_place,
-    '-='    => \&subtract_in_place,
-    '*='    => \&multiply_in_place,
-    '/='    => \&divide_in_place,
-    '0+'    => sub { $_[0]->value->numify; },
-    '""'    => sub { shift->stringify },
-    'bool'  => sub { shift->as_int; },
-    '<=>'   => \&three_way_compare,
-    'cmp'   => \&three_way_compare,
-    'abs'   => sub { shift->absolute },
-    '='     => sub { shift->clone },
-    'neg'   => \&negate,
+    '+'      => \&add,
+    '-'      => \&subtract,
+    '*'      => \&multiply,
+    '/'      => \&divide,
+    '%'      => \&modulo,
+    '+='     => \&add_in_place,
+    '-='     => \&subtract_in_place,
+    '*='     => \&multiply_in_place,
+    '/='     => \&divide_in_place,
+    '0+'     => sub { $_[0]->value->numify; },
+    '""'     => sub { shift->stringify },
+    'bool'   => sub { shift->as_int; },
+    '<=>'    => \&three_way_compare,
+    'cmp'    => \&three_way_compare,
+    'abs'    => sub { shift->absolute },
+    '='      => sub { shift->clone },
+    'neg'    => \&negate,
     fallback => 1;
 
 my $Amount = sub {
@@ -101,8 +101,8 @@ context, where it stringifies to the format specified in C<format>.
 
 =head1 MOTIVATION
 
-Data::Money was created to make it easy to use  different currencies ( leveraging
-existing work in C<Locale::Currency> and L<Moose|Moose>),to allow math operations
+Data::Money  was created to make it easy to use  different currencies (leveraging
+existing work in C<Locale::Currency> and L<Moo|Moo>), to  allow  math  operations
 with proper rounding (via L<Math::BigFloat>) and formatting via L<Locale::Currency::Format>.
 
 =head1 SYNOPSIS
