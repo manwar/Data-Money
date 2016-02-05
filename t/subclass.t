@@ -33,8 +33,8 @@ use Data::Dump qw/dump/;
 };
 
 {
-    my $gbp = Data::Money->new(code => 'GBP', value => 1);
-    my $cad = Data::Money->new(code => 'CAD', value => 1);
+    my $gbp = Data::Money::Too->new(code => 'GBP', value => 1);
+    my $cad = Data::Money::Too->new(code => 'CAD', value => 1);
 
     eval { my $result = $gbp + $cad; };
     ok($@ =~ /unable to perform arithmetic on different currency types/, 'code comparison caught for subclassed money types');
