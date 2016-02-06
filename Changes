@@ -1,5 +1,8 @@
 Revision history for Data::Money
 
+0.12  2016-02-06 MANWAR
+      - Merged PR #1 from DRAYLANG.
+
 0.11  2016-01-28 MANWAR
       - Removed reference to 'Moose' from the pod document as it is no longer
         dependent on it. It has been upgraded to use 'Moo' instead since v0.08

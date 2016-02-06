@@ -17,3 +17,4 @@ t/currency.t
 t/format_stripping.t
 t/overload.t
 t/locale.t
+t/subclass.t
