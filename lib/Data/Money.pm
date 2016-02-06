@@ -1,6 +1,6 @@
 package Data::Money;
 
-$Data::Money::VERSION   = '0.11';
+$Data::Money::VERSION   = '0.12';
 $Data::Money::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Data::Money - Money/currency with formatting and overloading.
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
@@ -210,7 +210,7 @@ sub clone {
 
     $param{code}   = $self->code;
     $param{format} = $self->format;
-    return Data::Money->new( \%param );
+    return $self->new( \%param );
 }
 
 =head2 as_float()
@@ -283,7 +283,7 @@ sub add {
     my $self = shift;
     my $num  = shift || 0;
 
-    if (ref($num) eq 'Data::Money') {
+    if (ref($num) eq ref($self)) {
         Data::Money::BaseException::MismatchCurrencyType->throw
             if ($self->code ne $num->code);
 
@@ -304,7 +304,7 @@ modify the existing object.
 sub add_in_place {
     my ($self, $num) = @_;
 
-    if (ref($num) eq 'Data::Money') {
+    if (ref($num) eq ref($self)) {
         Data::Money::BaseException::MismatchCurrencyType->throw
             if ($self->code ne $num->code);
 
@@ -360,7 +360,7 @@ sub subtract {
     my $self = shift;
     my $num  = shift || 0;
 
-    if (ref($num) eq 'Data::Money') {
+    if (ref($num) eq ref($self)) {
         Data::Money::BaseException::MismatchCurrencyType->throw
             if ($self->code ne $num->code);
 
@@ -381,7 +381,7 @@ modify the existing object.
 sub subtract_in_place {
     my ($self, $num) = @_;
 
-    if (ref($num) eq 'Data::Money') {
+    if (ref($num) eq ref($self)) {
         Data::Money::BaseException::MismatchCurrencyType->throw
             if ($self->code ne $num->code);
 
@@ -404,7 +404,7 @@ B<does not> modify the existing object.
 sub multiply {
     my ($self, $num) = @_;
 
-    if (ref($num) eq 'Data::Money') {
+    if (ref($num) eq ref($self)) {
         Data::Money::BaseException::MismatchCurrencyType->throw
             if ($self->code ne $num->code);
 
@@ -425,7 +425,7 @@ the existing object.
 sub multiply_in_place {
     my ($self, $num) = @_;
 
-    if (ref($num) eq 'Data::Money') {
+    if (ref($num) eq ref($self)) {
         Data::Money::BaseException::MismatchCurrencyType->throw
             if ($self->code ne $num->code);
 
@@ -448,7 +448,7 @@ B<does not> modify the existing object.
 sub divide {
     my ($self, $num) = @_;
 
-    if (ref($num) eq 'Data::Money') {
+    if (ref($num) eq ref($self)) {
         Data::Money::BaseException::MismatchCurrencyType->throw
             if ($self->code ne $num->code);
 
@@ -472,7 +472,7 @@ sub divide_in_place {
     my ($self, $num) = @_;
 
     my $val;
-    if (ref($num) eq 'Data::Money') {
+    if (ref($num) eq ref($self)) {
         Data::Money::BaseException::MismatchCurrencyType->throw
             if ($self->code ne $num->code);
 
@@ -496,7 +496,7 @@ object with the value of the remainder.
 sub modulo {
     my ($self, $num) = @_;
 
-    if (ref($num) eq 'Data::Money') {
+    if (ref($num) eq ref($self)) {
         Data::Money::BaseException::MismatchCurrencyType->throw
             if ($self->code ne $num->code);
 
@@ -521,7 +521,7 @@ sub three_way_compare {
     my $num  = shift || 0;
 
     my $other;
-    if (ref($num) eq 'Data::Money') {
+    if (ref($num) eq ref($self)) {
         $other = $num;
     } else {
         # we clone here to ensure that if we're comparing a number to
