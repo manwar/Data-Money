@@ -1,6 +1,6 @@
 package Data::Money;
 
-$Data::Money::VERSION   = '0.12';
+$Data::Money::VERSION   = '0.13';
 $Data::Money::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Data::Money - Money/currency with formatting and overloading.
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
@@ -136,18 +136,18 @@ with proper rounding (via L<Math::BigFloat>) and formatting via L<Locale::Curren
     $price /= 1;
 
     # Compares against numbers
-    if($m2 > 2)
-    if($m2 < 3)
-    if($m2 == 2.2)
+    print "Currency > 2 \n" if ($m2 > 2);
+    print "Currency < 3 \n" if ($m2 < 3);
+    print "Currency == 2.2 \n" if ($m2 == 2.2);
 
     # And strings
-    if($m2 gt '$2.00')
-    if($m2 lt '$3.00')
-    if($m2 eq '$2.20')
+    print "Currency gt \$2.00 \n" if ($m2 gt '$2.00');
+    print "Currency lt \$3.00 \n" if ($m2 lt '$3.00');
+    print "Currency eq \$2.20 \n" if ($m2 eq '$2.20');
 
     # and objects
-    if($m2 > $m3)
-    if($m3 lt $m2)
+    print "Currency m2 > m3 \n"  if ($m2 > $m3);
+    print "Currency m3 lt m2 \n" if ($m3 lt $m2);
 
     print $price->as_string('FMT_SYMBOL'); # $1.20
 

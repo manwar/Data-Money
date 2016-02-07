@@ -1,5 +1,8 @@
 Revision history for Data::Money
 
+0.13  2016-02-07 MANWAR
+      - Fixed issue RT #111832 (raised by SREZIC).
+
 0.12  2016-02-06 MANWAR
       - Merged PR #1 from DRAYLANG.
 
