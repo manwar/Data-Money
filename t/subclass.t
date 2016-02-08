@@ -1,22 +1,14 @@
 use Test::More;
 use strict;
 use warnings;
-use Encode;
-
-use Test::utf8;
-use Test::Exception;
-
 use Data::Money;
-use feature ':5.10';
-use Data::Dump qw/dump/;
 
 ## subclass Data::Money
 {
     package Data::Money::Too;
-    
+
     use Moo;
     extends 'Data::Money';
-    
 }
 
 

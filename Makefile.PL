@@ -19,7 +19,6 @@ WriteMakefile(
         'Test::More'      => '1.001014',
         'Test::utf8'      => 0,
         'Test::Exception' => 0,
-        'Data::Dump'      => 0,
     },
     PREREQ_PM => {
         'Moo'                      => '2.000000',
