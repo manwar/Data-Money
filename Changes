@@ -1,9 +1,14 @@
 Revision history for Data::Money
 
+0.15  2016-02-11 MANWAR
+      - Fixed error reported by CPANTESTER:
+        http://www.cpantesters.org/cpan/report/dfdbdb22-ce54-11e5-a096-cfe7ff3498d2
+        http://www.cpantesters.org/cpan/report/e68b303e-ce55-11e5-a096-cfe7ff3498d2
+
 0.14  2016-02-08 MANWAR
       - Removed redundant import from test script t/subclass.t
       - Fixed the error reported by CPANTTESTER:
-      http://www.cpantesters.org/cpan/report/71f95a70-cd6a-11e5-a125-fee1fbd2507e
+        http://www.cpantesters.org/cpan/report/71f95a70-cd6a-11e5-a125-fee1fbd2507e
 
 0.13  2016-02-07 MANWAR
       - Fixed issue RT #111832 (raised by SREZIC).

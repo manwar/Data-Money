@@ -23,6 +23,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Moo'                      => '2.000000',
         'namespace::clean'         => '0.24',
+        'Moo::Role'                => '2.000000',
         'Throwable'                => 0,
         'Math::BigFloat'           => '1.999704',
         'Locale::Currency'         => '2.07',
