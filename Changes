@@ -1,5 +1,9 @@
 Revision history for Data::Money
 
+0.16  2016-02-29 MANWAR
+      - Fixed the method clone() in the package Data::Money as it was breaking
+        Data::Money::Converter.
+
 0.15  2016-02-11 MANWAR
       - Fixed error reported by CPANTESTER:
         http://www.cpantesters.org/cpan/report/dfdbdb22-ce54-11e5-a096-cfe7ff3498d2

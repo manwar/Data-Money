@@ -1,6 +1,6 @@
 package Data::Money;
 
-$Data::Money::VERSION   = '0.15';
+$Data::Money::VERSION   = '0.16';
 $Data::Money::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Data::Money - Money/currency with formatting and overloading.
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
@@ -208,9 +208,9 @@ specify some of the attributes to overwrite.
 sub clone {
     my ($self, %param) = @_;
 
-    $param{code}   = $self->code;
-    $param{format} = $self->format;
-    return $self->new( \%param );
+    $param{code}   = $self->code   unless (exists $param{code}   && defined $param{code});
+    $param{format} = $self->format unless (exists $param{format} && defined $param{format});
+    return $self->new(\%param);
 }
 
 =head2 as_float()
