@@ -13,6 +13,8 @@ README
 t/00-load.t
 t/pod.t
 t/manifest.t
+t/meta-json.t
+t/meta-yml.t
 t/currency.t
 t/format_stripping.t
 t/overload.t

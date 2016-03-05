@@ -1,5 +1,9 @@
 Revision history for Data::Money
 
+0.17  2016-03-05 MANWAR
+      - Added key 'provides' to the Makefile.PL script.
+      - Added test script t/meta-json.t and t/meta-yml.t.
+
 0.16  2016-02-29 MANWAR
       - Fixed the method clone() in the package Data::Money as it was breaking
         Data::Money::Converter.
