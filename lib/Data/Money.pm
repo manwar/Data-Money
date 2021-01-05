@@ -210,6 +210,7 @@ sub clone {
 
     $param{code}   = $self->code   unless (exists $param{code}   && defined $param{code});
     $param{format} = $self->format unless (exists $param{format} && defined $param{format});
+    $param{value}  = $self->value  unless (exists $param{value}  && defined $param{value});
     return $self->new(\%param);
 }
 
