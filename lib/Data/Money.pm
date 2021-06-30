@@ -579,8 +579,8 @@ sub _to_utf8 {
     my $value = shift;
 
     if ($] >= 5.008) {
-        require utf8;
-        utf8::upgrade($value);
+        use Encode;
+        decode('UTF-8', $value);
     };
 
     return $value;
