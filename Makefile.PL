@@ -47,6 +47,10 @@ WriteMakefile(
                 url  => 'https://github.com/manwar/Data-Money.git',
                 web  => 'https://github.com/manwar/Data-Money',
             },
+            bugtracker => {
+                web => 'https://github.com/manwar/Data-Money/issues'
+            },
+            homepage   => 'https://github.com/manwar/Data-Money',
         }})
      : ()
     ),
